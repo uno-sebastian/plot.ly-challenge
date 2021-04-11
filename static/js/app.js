@@ -1,3 +1,23 @@
+var url = window.location.href + "/data/samples.json";
+
+// honestly, this is for my ocd :)
+if (url.includes("//data/samples.json"))
+	url = url.replace("//data/samples.json", "/data/samples.json");
+
+// this is to help test on local instance 
+if (url.includes("index.html"))
+	url = url.replace("index.html", "");
+
+d3.json(url).then(function (samplesData) {
+	var metadata = samplesData.metadata;
+	var names = samplesData.names;
+	var samples = samplesData.samples;
+
+	console.log(names);
+	console.log(samples);
+	console.log(metadata);
+});
+
 
 // <div class="col-md-2">
 // 	<div class="well">
