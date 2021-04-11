@@ -1,6 +1,7 @@
 var url = window.location.href + "/data/samples.json";
 var metadata = null;
 var samples = null;
+var idToDegrees = 0;
 
 // honestly, this is for my ocd :)
 if (url.includes("//data/samples.json"))
@@ -13,6 +14,15 @@ if (url.includes("index.html"))
 d3.json(url).then(function (samplesData) {
 	samples = samplesData.samples;
 	metadata = samplesData.metadata;
+
+	var maxId = 1;
+	samples.forEach(sample => {
+		var newMaxId = Math.max(sample.otu_ids);
+		if (newMaxId > maxId)
+			maxId = newMaxId;
+	});
+	idToDegrees = 0.9 / maxId;
+
 	addSelectionOptions(samplesData.names);
 });
 
@@ -41,6 +51,7 @@ function optionChanged() {
 		for (i = 0; i < length; i++)
 			if (value == samples[i].id) {
 				updateBarChart(samples[i]);
+				updateBubbleChart(samples[i]);
 				break;
 			}
 	}
@@ -85,7 +96,7 @@ function updateBarChart(sample) {
 	var data = [{
 		x: top10OTUsFound.map(object => object.sample_values),
 		y: top10OTUsFound.map(object => `OTU ${object.otu_ids}`),
-		text: top10OTUsFound.map(object => object.otu_labels.split(";").join(", ")),
+		text: top10OTUsFound.map(object => object.otu_labels.split(";").join("<br>")),
 		type: "bar",
 		orientation: "h"
 	}];
@@ -120,4 +131,58 @@ function sortTop10OTUsFound(sample) {
 	return sorted;
 }
 
-//Plotly.newPlot("bubble", barData, barLayout);
+function updateBubbleChart(sample) {
+
+	if (sample == null) {
+		d3.select("bubble").text("");
+		return;
+	}
+
+	var data = [{
+		x: sample.otu_ids,
+		y: sample.sample_values,
+		text: sample.otu_labels.map(object => object.split(";").join("<br>")),
+		mode: 'markers',
+		marker: {
+			color: sample.otu_ids.map(object => otuIdToRgb(object)),
+			size: sample.sample_values
+		}
+	}];
+
+	var layout = {
+		title: `All Samples for Test Subject ID No. ${sample.id}`
+	};
+
+	Plotly.newPlot("bubble", data, layout);
+}
+
+function otuIdToRgb(id){
+	var color = HSVtoRGB(id * idToDegrees, 1.0, 1.0);
+	return `rgb(${color.r}, ${color.g}, ${color.b})`;
+}
+
+// https://stackoverflow.com/a/17243070
+function HSVtoRGB(h, s, v) {
+	var r, g, b, i, f, p, q, t;
+	if (arguments.length === 1) {
+		s = h.s, v = h.v, h = h.h;
+	}
+	i = Math.floor(h * 6);
+	f = h * 6 - i;
+	p = v * (1 - s);
+	q = v * (1 - f * s);
+	t = v * (1 - (1 - f) * s);
+	switch (i % 6) {
+		case 0: r = v, g = t, b = p; break;
+		case 1: r = q, g = v, b = p; break;
+		case 2: r = p, g = v, b = t; break;
+		case 3: r = p, g = q, b = v; break;
+		case 4: r = t, g = p, b = v; break;
+		case 5: r = v, g = p, b = q; break;
+	}
+	return {
+		r: Math.round(r * 255),
+		g: Math.round(g * 255),
+		b: Math.round(b * 255)
+	};
+}
