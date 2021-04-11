@@ -1,4 +1,7 @@
 var url = window.location.href + "/data/samples.json";
+var metadata = null;
+var names = null;
+var samples = null;
 
 // honestly, this is for my ocd :)
 if (url.includes("//data/samples.json"))
@@ -9,28 +12,49 @@ if (url.includes("index.html"))
 	url = url.replace("index.html", "");
 
 d3.json(url).then(function (samplesData) {
-	var metadata = samplesData.metadata;
-	var names = samplesData.names;
-	var samples = samplesData.samples;
+	metadata = samplesData.metadata;
+	samples = samplesData.samples;
 
-	console.log(names);
+	addSelectionOptions(samplesData.names);
+
 	console.log(samples);
 	console.log(metadata);
 });
 
+function addSelectionOptions(names) {
+	var body = d3.select("#selDataset");
+	// add in the "nothing selected" option
+	body.append("option").attr("selected");
+	//<option value="NAME">NAME</option>
+	body.selectAll("option")
+		.data(names)
+		.enter()
+		.append("option")
+		.attr("value", data => data)
+		.text(data => data);
+}
 
-// <div class="col-md-2">
-// 	<div class="well">
-// 	<h5>Test Subject ID No.:</h5>
-// 	<select id="selDataset" onchange="optionChanged(this.value)"></select>
-// 	</div>
-// 	<div class="panel panel-primary">
-// 	<div class="panel-heading">
-// 		<h3 class="panel-title">Demographic Info</h3>
-// 	</div>
-// 	<div id="sample-metadata" class="panel-body"></div>
-// 	</div>
-// </div>
+// Function called by DOM changes
+function optionChanged() {
+	var body = d3.select("#sample-metadata");
+	body.text("");
+	if (metadata == null) return;
+	var sample = +d3.select("#selDataset").property("value");
+	if (sample == null) return;
+	var length = metadata.length;
+	var i;
+	for (i = 0; i < length; i++)
+		if (sample === metadata[i].id) {
+			body.append("h5").text(`id: ${metadata[i].id}`);
+			body.append("h5").text(`ethnicity: ${metadata[i].ethnicity}`);
+			body.append("h5").text(`gender: ${metadata[i].gender}`);
+			body.append("h5").text(`age: ${metadata[i].age}`);
+			body.append("h5").text(`location: ${metadata[i].location}`);
+			body.append("h5").text(`bbtype: ${metadata[i].bbtype}`);
+			body.append("h5").text(`wfreq: ${metadata[i].wfreq}`);
+			break;
+		}
+}
 
 //Plotly.newPlot("bar", barData, barLayout);
 //Plotly.newPlot("bubble", barData, barLayout);
