@@ -1,0 +1,1 @@
+//Plotly.newPlot("gauge", barData, barLayout);
