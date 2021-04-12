@@ -54,13 +54,14 @@ function optionChanged() {
 				updateBubbleChart(samples[i]);
 				break;
 			}
-	}
-
-	if (metadata != null) {
-		var length = metadata.length;
-		var i;
-		for (i = 0; i < length; i++)
+		}
+		
+		if (metadata != null) {
+			var length = metadata.length;
+			var i;
+			for (i = 0; i < length; i++)
 			if (value == metadata[i].id) {
+				updateGauge(metadata[i]);
 				updateSelectionTable(metadata[i]);
 				break;
 			}
