@@ -75,14 +75,16 @@ function updateSelectionTable(metadata) {
 	body.text("");
 
 	if (metadata == null) return;
-
-	body.append("h5").text(`id: ${metadata.id}`);
-	body.append("h5").text(`ethnicity: ${metadata.ethnicity}`);
-	body.append("h5").text(`gender: ${metadata.gender}`);
-	body.append("h5").text(`age: ${metadata.age}`);
-	body.append("h5").text(`location: ${metadata.location}`);
-	body.append("h5").text(`bbtype: ${metadata.bbtype}`);
-	body.append("h5").text(`wfreq: ${metadata.wfreq}`);
+	var text = [
+		`id: ${metadata.id}`,
+		`ethnicity: ${metadata.ethnicity}`,
+		`gender: ${metadata.gender}`,
+		`age: ${metadata.age}`,
+		`location: ${metadata.location}`,
+		`bbtype: ${metadata.bbtype}`,
+		`wfreq: ${metadata.wfreq}`
+	];
+	body.append("body").html(text.join("<br>"));
 }
 
 function updateBarChart(sample) {
