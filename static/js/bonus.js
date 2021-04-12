@@ -11,8 +11,8 @@ const endColor = {
 	b: 138
 };
 
-function updateGauge(sample) {
-	console.log(sample);
+function updateGauge(metadata) {
+	console.log(metadata);
 
 	var data = [
 		{
@@ -30,7 +30,15 @@ function updateGauge(sample) {
 					tickwidth: 0
 				},
 				borderwidth: 0,
-				steps: getGuageSteps()
+				steps: getGuageSteps(),
+				threshold: {
+					line: {
+						color: "rgb(131,3,8)",
+						width: 10
+					},
+					thickness: 1,
+					value: 9
+				}
 			},
 			domain: {
 				row: 0,
@@ -50,6 +58,7 @@ function updateGauge(sample) {
 	};
 
 	Plotly.newPlot('gauge', data, layout);
+	modifyArcArrow(d3.select(".threshold-arc"), +metadata.wfreq * (180 / 9));
 }
 
 function getGuageSteps() {
@@ -69,4 +78,12 @@ function lerpColor(color1, color2, t) {
 	var g = lerp(color1.g, color2.g, t);
 	var b = lerp(color1.b, color2.b, t);
 	return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+}
+
+function modifyArcArrow(arrow, angle) {
+	angle = -angle - 90;
+	var M = `M${160 * Math.sin(Math.PI * (angle / 180))},${160 * Math.cos(Math.PI * (angle / 180))}`;
+	var A = `A${150},${0} ${0} ${0},${0} ${0},${0}`;
+	var L = `L${0},${0}`;
+	arrow.select("path").attr("d", `${M}${A}${L}${A}Z`);
 }
