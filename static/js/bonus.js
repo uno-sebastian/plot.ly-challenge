@@ -58,7 +58,7 @@ function updateGauge(metadata) {
 	};
 
 	Plotly.newPlot('gauge', data, layout);
-	modifyArcArrow(d3.select(".threshold-arc"), +metadata.wfreq * (180 / 9));
+	modifyArcArrow(d3.select(".threshold-arc"), +metadata.wfreq);
 }
 
 function getGuageSteps() {
@@ -80,10 +80,24 @@ function lerpColor(color1, color2, t) {
 	return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
 }
 
-function modifyArcArrow(arrow, angle) {
-	angle = -angle - 90;
-	var M = `M${160 * Math.sin(Math.PI * (angle / 180))},${160 * Math.cos(Math.PI * (angle / 180))}`;
+function modifyArcArrow(arrow, wfreq) {
+	var M = `M${160 * Math.sin(countToRadians(wfreq))},${160 * Math.cos(countToRadians(wfreq))}`;
 	var A = `A${150},${0} ${0} ${0},${0} ${0},${0}`;
 	var L = `L${0},${0}`;
 	arrow.select("path").attr("d", `${M}${A}${L}${A}Z`);
+
+	d3.select(".angular").selectAll(".bg-arc")
+		.append("text")
+		.attr("x", (d,i) => 175 * Math.sin(countToRadians(i)))
+		.attr("y", (d,i) => 175 * Math.cos(countToRadians(i)))
+		.attr("text-anchor", "middle")
+		.text((d,i) =>`${i-1}-${i}`);
+}
+
+function countToRadians(index) {
+	var angle = index * (180 / 9);
+	if (index > 0)
+		angle -= 0.5 * (180 / 9)
+	angle = -angle - 90;
+	return Math.PI * (angle / 180);
 }
