@@ -8,6 +8,8 @@ The dataset reveals that a small handful of microbial species (also called opera
 
 # Check out the [app](static/js/app.js) and the [bonus](static/js/bonus.js)!
 
+* Note: You'll need to use `python -m http.server` to run the visualization. This will host the page at `localhost:8000` in your web browser.
+
 ## Step 1: Plotly
 
 1. Use the D3 library to read in `samples.json`.
